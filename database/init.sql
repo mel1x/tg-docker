@@ -12,3 +12,12 @@ CREATE TABLE IF NOT EXISTS user_messages (
     message_text TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Тестовые данные
+INSERT INTO users (user_id, username, first_name, last_name) 
+VALUES (123456, 'test_user', 'Иван', 'Петров')
+ON CONFLICT (user_id) DO NOTHING;
+
+INSERT INTO user_messages (user_id, username, message_text) 
+VALUES (123456, 'test_user', 'Первое тестовое сообщение')
+ON CONFLICT DO NOTHING;
