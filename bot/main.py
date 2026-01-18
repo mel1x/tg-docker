@@ -40,13 +40,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn.commit()
     cursor.close()
     conn.close()
-    await update.message.reply_text("ÐŸÑ€Ð¸Ð²ÐµÑ‚! Ð¢Ñ‹ Ð·Ð°Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ð½.")
+    await update.message.reply_text("Привет! Используй /add <сообщение> и /read.")
 
 
 async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if not context.args:
-        await update.message.reply_text("Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ: /add <ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ>")
+        await update.message.reply_text("Использование: /add <сообщение>")
         return
     messageText = ' '.join(context.args)
     conn = connectDb()
@@ -58,7 +58,7 @@ async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn.commit()
     cursor.close()
     conn.close()
-    await update.message.reply_text("Ð¡Ð¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¾!")
+    await update.message.reply_text("Сообщение добавлено!")
 
 
 async def read(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -84,9 +84,9 @@ async def showMessages(update: Update, page: int):
 
     if not messages:
         if update.callback_query:
-            await update.callback_query.message.edit_text("ÐÐµÑ‚ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ð¹.")
+            await update.callback_query.message.edit_text("Нет сообщений.")
         else:
-            await update.message.reply_text("ÐÐµÑ‚ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ð¹.")
+            await update.message.reply_text("Нет сообщений.")
         return
 
     keyboard = []
@@ -97,14 +97,14 @@ async def showMessages(update: Update, page: int):
 
     navButtons = []
     if page > 0:
-        navButtons.append(InlineKeyboardButton("â¬…ï¸ ÐÐ°Ð·Ð°Ð´", callback_data=f"page_{page - 1}"))
+        navButtons.append(InlineKeyboardButton("⬅️ Назад", callback_data=f"page_{page - 1}"))
     if offset + 8 < total:
-        navButtons.append(InlineKeyboardButton("Ð’Ð¿ÐµÑ€ÐµÐ´ âž¡ï¸", callback_data=f"page_{page + 1}"))
+        navButtons.append(InlineKeyboardButton("Вперед ➡️", callback_data=f"page_{page + 1}"))
     if navButtons:
         keyboard.append(navButtons)
 
     replyMarkup = InlineKeyboardMarkup(keyboard)
-    text = f"Ð¡Ð¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ñ (ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ð° {page + 1}):"
+    text = f"Сообщения (страница {page + 1}):"
 
     if update.callback_query:
         await update.callback_query.message.edit_text(text, reply_markup=replyMarkup)
