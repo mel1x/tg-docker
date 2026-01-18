@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # База данных PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: telegram_bot_db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=ru_RU.UTF-8 --lc-ctype=ru_RU.UTF-8"
+    volumes:
+      # Volume для сохранения данных БД
+      - postgres_data:/var/lib/postgresql/data
+      # Монтируем init.sql для инициализации БД
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Telegram бот
+  bot:
+    build: .
+    container_name: telegram_bot_app
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PYTHONIOENCODING: utf-8
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+# Определяем volume для хранения данных PostgreSQL
+volumes:
+  postgres_data:
+    driver: local

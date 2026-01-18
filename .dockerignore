@@ -1,0 +1,15 @@
+# Исключаем ненужные файлы из образа
+.env
+env.example
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
